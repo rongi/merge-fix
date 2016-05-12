@@ -17,4 +17,4 @@ This single command
 - merges fix branch into develop branch with --ff-only flag
 - pushes everything to the remote
 - deletes local and remote fix branches
-- brings peace to the world and all people happy and dancing in joy
+- brings peace to the world and all the people happy and dancing in joy
