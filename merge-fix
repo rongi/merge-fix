@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+# Merges feature branch to master branch
+# and does all supporting crap like rebasing before merge and
+# deleting old branches
+
+MASTER_BRANCH="develop"
+
+ERROR_ON_MASTER_BRANCH=100
+
+function exitIfLastCommandWasError {
+  if [ $? -ne 0 ]
+  then
+    exit 1
+  fi
+}
+
+function get_current_branch {
+  git_branch_output=$(git symbolic-ref HEAD)
+  exitIfLastCommandWasError
+  current_branch=${git_branch_output#refs/heads/}
+}
+
+function exit_if_on_master_branch {
+  get_current_branch
+  if [ "$current_branch" = "$MASTER_BRANCH" ]
+  then
+      echo "Current branch is $MASTER_BRANCH"
+      echo "Should be feature branch, exiting"
+      exit ${ERROR_ON_MASTER_BRANCH}
+  fi
+}
+
+get_current_branch
+exit_if_on_master_branch
+echo "On branch \"$current_branch\""
+INITIAL_BRANCH="$current_branch"
+
+git fetch
+exitIfLastCommandWasError
+
+git rebase origin/$MASTER_BRANCH
+exitIfLastCommandWasError
+
+# Extra safe check so we don't push force master
+exit_if_on_master_branch
+git push --force
+exitIfLastCommandWasError
+
+git checkout $MASTER_BRANCH
+exitIfLastCommandWasError
+
+git pull --ff-only
+exitIfLastCommandWasError
+
+git merge $INITIAL_BRANCH --ff-only
+exitIfLastCommandWasError
+
+git push
+exitIfLastCommandWasError
+
+git branch --delete $INITIAL_BRANCH
+exitIfLastCommandWasError
+
+# Extra safe check so we don't delete master :)
+if [ "$INITIAL_BRANCH" = "$MASTER_BRANCH" ]
+then
+    echo "Current branch is $MASTER_BRANCH"
+    echo "Should be feature branch, exiting"
+    exit 1
+fi
+git push origin --delete $INITIAL_BRANCH
+exitIfLastCommandWasError
+
+echo "Merge succes, on master branch now"
