@@ -18,3 +18,5 @@ This single command
 - pushes everything to the remote
 - deletes local and remote fix branches
 - brings peace to the world and all the people happy and dancing in joy
+
+It uses --ff-only merge strategy, which is only suitable for situations when you don’t want merge commit (bug fixes mostly)
