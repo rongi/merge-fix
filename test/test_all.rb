@@ -19,7 +19,7 @@ class TC_All < Test::Unit::TestCase
   end
 
   def teardown
-    # `rm -rf ../test-output`
+    `rm -rf ../test-output`
   end
 
   def test__on_develop_branch__exit
