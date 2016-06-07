@@ -8,6 +8,16 @@ MASTER_BRANCH="develop"
 
 ERROR_ON_MASTER_BRANCH=100
 
+MERGE_FLAGS="--ff-only"
+
+for arg
+do
+  if [ "$arg" = "--no-ff" ]
+  then
+    MERGE_FLAGS="--no-ff"
+  fi
+done
+
 function exitIfLastCommandWasError {
   if [ $? -ne 0 ]
   then
@@ -53,7 +63,7 @@ exitIfLastCommandWasError
 git pull --ff-only
 exitIfLastCommandWasError
 
-git merge $INITIAL_BRANCH --ff-only
+git merge $INITIAL_BRANCH $MERGE_FLAGS
 exitIfLastCommandWasError
 
 git push
@@ -72,4 +82,4 @@ fi
 git push origin --delete $INITIAL_BRANCH
 exitIfLastCommandWasError
 
-echo "Merge succes, on master branch now"
+echo "Merge success, on master branch now"
