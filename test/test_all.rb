@@ -88,4 +88,19 @@ class TC_All < Test::Unit::TestCase
     }
   end
 
+  def test__merge_feature
+    Dir.chdir('../test-output/git-repository') {
+      `git checkout -b fix1`
+      `echo 'som fix' >> file1`
+      `git add .`
+      `git commit -m "fixed a little"`
+
+      puts `../../merge-feature`
+
+      assert_equal(0, $?)
+      assert_equal("Merge branch 'fix1' into develop\nfixed a little\nfirst commit", `git log --pretty=format:"%s" --topo-order`)
+      assert_equal('refs/heads/develop', `git symbolic-ref HEAD`.strip)
+    }
+  end
+
 end
