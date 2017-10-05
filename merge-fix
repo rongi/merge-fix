@@ -4,7 +4,7 @@
 # and does all supporting crap like rebasing before merge and
 # deleting old branches
 
-MASTER_BRANCH="develop"
+MASTER_BRANCH="master"
 
 ERROR_ON_MASTER_BRANCH=100
 
