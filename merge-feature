@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-merge-fix --no-ff
