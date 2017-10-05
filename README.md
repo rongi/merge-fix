@@ -7,7 +7,7 @@ brew install merge-fix
 
 # Use
 When on a fix branch
-`merge-fix`
+`mergefix`
 
 # What it does
 

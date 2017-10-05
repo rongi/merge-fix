@@ -8,13 +8,13 @@ class TC_All < Test::Unit::TestCase
     `git init ../test-output/git-repository`
     `git init --bare ../test-output/git-repository.git`
     Dir.chdir('../test-output/git-repository') {
-      `git checkout -b develop`
+      `git checkout -b master`
       `touch file1`
       `git add file1`
       `git commit -m "first commit"`
       `git remote add origin ../git-repository.git`
-      `git push origin develop`
-      `git branch --set-upstream-to=origin/develop develop`
+      `git push origin master`
+      `git branch --set-upstream-to=origin/master master`
     }
   end
 
@@ -22,14 +22,14 @@ class TC_All < Test::Unit::TestCase
     `rm -rf ../test-output`
   end
 
-  def test__on_develop_branch__exit
+  def test__on_master_branch__exit
     Dir.chdir('../test-output/git-repository') {
-      puts `../../merge-fix`
+      puts `../../mergefix`
 
       exit_status = $? >> 8
       assert_equal(100, exit_status)
       assert_equal('first commit', `git log --pretty=format:"%s"`)
-      assert_equal('refs/heads/develop', `git symbolic-ref HEAD`.strip)
+      assert_equal('refs/heads/master', `git symbolic-ref HEAD`.strip)
     }
   end
 
@@ -40,11 +40,11 @@ class TC_All < Test::Unit::TestCase
       `git add .`
       `git commit -m "fixed a little"`
 
-      puts `../../merge-fix`
+      puts `../../mergefix`
 
       assert_equal(0, $?)
       assert_equal("fixed a little\nfirst commit", `git log --pretty=format:"%s"`)
-      assert_equal('refs/heads/develop', `git symbolic-ref HEAD`.strip)
+      assert_equal('refs/heads/master', `git symbolic-ref HEAD`.strip)
     }
   end
 
@@ -55,21 +55,21 @@ class TC_All < Test::Unit::TestCase
       `git add .`
       `git commit -m "fixed a little"`
 
-      `git checkout develop`
+      `git checkout master`
       `git checkout -b fix2`
       `echo 'som fix 2' >> file1`
       `git add .`
       `git commit -m "fixed a little 2"`
-      `git checkout develop`
+      `git checkout master`
       `git merge fix2 --ff-only`
       `git push`
       `git checkout fix1`
 
-      puts `../../merge-fix`
+      puts `../../mergefix`
 
       assert_equal(0, $?)
       assert_equal("fixed a little\nfixed a little 2\nfirst commit", `git log --pretty=format:"%s"`)
-      assert_equal('refs/heads/develop', `git symbolic-ref HEAD`.strip)
+      assert_equal('refs/heads/master', `git symbolic-ref HEAD`.strip)
     }
   end
 
@@ -80,11 +80,11 @@ class TC_All < Test::Unit::TestCase
       `git add .`
       `git commit -m "fixed a little"`
 
-      puts `../../merge-fix --no-ff`
+      puts `../../mergefix --no-ff`
 
       assert_equal(0, $?)
-      assert_equal("Merge branch 'fix1' into develop\nfixed a little\nfirst commit", `git log --pretty=format:"%s" --topo-order`)
-      assert_equal('refs/heads/develop', `git symbolic-ref HEAD`.strip)
+      assert_equal("Merge branch 'fix1'\nfixed a little\nfirst commit", `git log --pretty=format:"%s" --topo-order`)
+      assert_equal('refs/heads/master', `git symbolic-ref HEAD`.strip)
     }
   end
 

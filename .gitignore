@@ -1,4 +1,5 @@
 /out
+/test-empty
 .idea
 test-output
 *.iml
