@@ -8,6 +8,7 @@ brew install merge-fix
 # Use
 When on a fix branch
 `mergefix`
+It will merge current branch into the master branch.
 
 # What it does
 
