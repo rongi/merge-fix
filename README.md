@@ -16,7 +16,7 @@ It will merge current branch into the master branch.
 
 This single command
 - fetches changes from the remote
-- rebases fix branch on top of the develop branch
+- rebases fix branch on top of the master branch
 - merges fix branch into develop branch with --ff-only flag
 - pushes everything to the remote
 - deletes local and remote fix branches
