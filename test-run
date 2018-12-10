@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+(cd test; bundle exec ruby -I test ./test_all.rb)
+(cd test; bundle exec ruby -I test ././test_no_repository.rb)

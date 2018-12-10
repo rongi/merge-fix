@@ -29,3 +29,7 @@ This single command
 - brings peace to the world and all the people happy and dancing in joy
 
 It uses --ff-only merge strategy by default, which is only suitable for situations when you don’t want merge commit (bug fixes mostly) Can use --no-ff strategy if corresponding flag is provided.
+
+# Test
+
+`./test-run`
