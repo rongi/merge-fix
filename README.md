@@ -5,6 +5,12 @@ brew tap rongi/tap
 brew install merge-fix
 ```
 
+# Update
+
+```
+brew upgrade rongi/tap/merge-fix
+```
+
 # Use
 When on a fix branch
 
