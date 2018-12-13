@@ -12,11 +12,13 @@ When on a fix branch
 
 It will merge current branch into the master branch.
 
-Use 
+To specify target branch
+
+`mergefix -b <target_branch>`
+
+To force merge with a merge commit.
 
 `mergefix --no-ff` 
-
-to force a merge with a merge commit.
 
 # What it does
 
