@@ -88,4 +88,23 @@ class TC_All < Test::Unit::TestCase
     }
   end
 
+  def test__merges_to_custom_branch_alright
+    Dir.chdir('../test-output/git-repository') {
+      `git checkout -b release`
+      `git push origin release`
+      `git branch --set-upstream-to=origin/release release`
+      `git checkout -b fix1`
+      `echo 'som fix' >> file1`
+      `git add .`
+      `git commit -m "fixed a little"`
+
+      puts `../../mergefix -b release`
+
+      assert_equal(0, $?)
+      assert_equal("fixed a little\nfirst commit", `git log --pretty=format:"%s"`)
+      assert_equal("first commit", `git log master --pretty=format:"%s"`)
+      assert_equal('refs/heads/release', `git symbolic-ref HEAD`.strip)
+    }
+  end
+
 end

@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
+set -e
 
 # Merges feature branch to master branch
 # and does all supporting crap like rebasing before merge and
 # deleting old branches
+
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
 
 MASTER_BRANCH="master"
 
 ERROR_ON_MASTER_BRANCH=100
 
 MERGE_FLAGS="--ff-only"
+
+MERGE_BRANCH=$MASTER_BRANCH
+
+INITIAL_COMMIT="uninitialised"
 
 for arg
 do
@@ -18,17 +26,21 @@ do
   fi
 done
 
-function exitIfLastCommandWasError {
-  if [ $? -ne 0 ]
-  then
-    exit 1
-  fi
-}
+while getopts b: option
+do
+  case "${option}"
+    in
+    b) MERGE_BRANCH=${OPTARG};;
+  esac
+done
 
 function get_current_branch {
   git_branch_output=$(git symbolic-ref HEAD)
-  exitIfLastCommandWasError
   current_branch=${git_branch_output#refs/heads/}
+}
+
+function get_current_commit {
+  current_commit=$(git rev-parse HEAD)
 }
 
 function exit_if_on_master_branch {
@@ -41,36 +53,52 @@ function exit_if_on_master_branch {
   fi
 }
 
+function exit_if_on_merge_branch {
+  get_current_branch
+  if [ "$current_branch" = "$MERGE_BRANCH" ]
+  then
+      echo "Current branch is $MASTER_BRANCH, the same as target branch"
+      echo "Should be feature branch, exiting"
+      exit ${ERROR_ON_MASTER_BRANCH}
+  fi
+}
+
 get_current_branch
+get_current_commit
+
 exit_if_on_master_branch
-echo "On branch \"$current_branch\""
+exit_if_on_merge_branch
+
+echo -e "${GREEN}On branch: \"$current_branch\", commit: \"$current_commit\"${NC}"
+
 INITIAL_BRANCH="$current_branch"
+INITIAL_COMMIT="$current_commit"
 
 git fetch
-exitIfLastCommandWasError
 
-git rebase origin/$MASTER_BRANCH
-exitIfLastCommandWasError
+echo -e "${GREEN}Rebasing. In case rebase went wrong it can be reverted with: \"git rebase --abort\"${NC}"
+echo -e "${GREEN}In case something else went wrong, current branch can be restored using${NC}"
+echo -e "${GREEN}git checkout $INITIAL_BRANCH;git reset --hard $current_commit${NC}"
 
-# Extra safe check so we don't push force master
+git rebase origin/$MERGE_BRANCH
+
+# Extra safe check so we don't push force master or target
 exit_if_on_master_branch
+exit_if_on_merge_branch
 git push --force
-exitIfLastCommandWasError
 
-git checkout $MASTER_BRANCH
-exitIfLastCommandWasError
+git checkout $MERGE_BRANCH
 
 git pull --ff-only
-exitIfLastCommandWasError
 
 git merge $INITIAL_BRANCH $MERGE_FLAGS
-exitIfLastCommandWasError
 
 git push
-exitIfLastCommandWasError
+
+echo -e "${GREEN}Deleting source branch. In case something went wrong it can be restored using${NC}"
+echo -e "${GREEN}git checkout -b $INITIAL_BRANCH $INITIAL_COMMIT${NC}"
 
 git branch --delete $INITIAL_BRANCH
-exitIfLastCommandWasError
 
 # Extra safe check so we don't delete master :)
 if [ "$INITIAL_BRANCH" = "$MASTER_BRANCH" ]
@@ -79,7 +107,15 @@ then
     echo "Should be feature branch, exiting"
     exit 1
 fi
-git push origin --delete $INITIAL_BRANCH
-exitIfLastCommandWasError
 
-echo "Merge success, on master branch now"
+# Extra safe check so we don't delete target branch :)
+if [ "$INITIAL_BRANCH" = "$MERGE_BRANCH" ]
+then
+    echo "Current branch is $MERGE_BRANCH"
+    echo "Should be feature branch, exiting"
+    exit 1
+fi
+
+git push origin --delete $INITIAL_BRANCH
+
+echo "Merge success, on $MERGE_BRANCH branch now"

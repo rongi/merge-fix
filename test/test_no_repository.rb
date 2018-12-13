@@ -16,7 +16,7 @@ class TC_NoRepository < Test::Unit::TestCase
     Dir.chdir("#{Dir.home}/mergefix-test-empty") {
       `#{current_dir}/../mergefix`
       exit_status = $? >> 8
-      assert_equal(1, exit_status)
+      assert_not_equal(0, exit_status)
     }
   end
 
